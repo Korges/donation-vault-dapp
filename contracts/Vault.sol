@@ -5,7 +5,7 @@ import "./Owned.sol";
 import "./Logger.sol";
 import "./IVault.sol";
 
-contract Faucet is Owned, Logger, IVault {
+contract Vault is Owned, Logger, IVault {
   uint public numOfFunders;
 
   mapping(address => bool) private funders;
