@@ -6,6 +6,6 @@
 4. `pnpm hardhat run ./scripts/deploy.ts --network localhost`
 5. `pnpm run frontend`
 6. interact with MetaMask
-7. **(Optional) 
+7. **(Optional)**
   - Copy the generated contract address 
   - `pnpm hardhat run ./scripts/event-listener.ts`
