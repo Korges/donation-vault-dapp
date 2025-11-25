@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.28;
 
 import "./Owned.sol";
 import "./Logger.sol";
@@ -19,6 +19,9 @@ contract Vault is Owned, Logger, IVault {
     _;
   }
 
+  event Funder(address indexed user, uint amount);
+  event Withdrawal(address indexed user, uint amount);
+
   receive() external payable {}
 
   function emitLog() public override pure returns(bytes32) {
@@ -27,25 +30,22 @@ contract Vault is Owned, Logger, IVault {
 
   function addFunds() override external payable {
     address funder = msg.sender;
-    test3();
 
     if (!funders[funder]) {
       uint index = numOfFunders++;
       funders[funder] = true;
       lutFunders[index] = funder;
+      
     }
-  }
-
-  function test1() external onlyOwner {
-    // some managing stuff that only admin should have access to
-  }
-
-  function test2() external onlyOwner {
-    // some managing stuff that only admin should have access to
+    emit Funder(msg.sender, msg.value);
   }
 
   function withdraw(uint withdrawAmount) override external limitWithdraw(withdrawAmount) {
+
+    require(address(this).balance >= withdrawAmount, "Not enough balance in contract");
     payable(msg.sender).transfer(withdrawAmount);
+
+    emit Withdrawal(msg.sender, withdrawAmount);
   }
 
   function getAllFunders() external view returns (address[] memory) {
@@ -62,14 +62,3 @@ contract Vault is Owned, Logger, IVault {
     return lutFunders[index];
   }
 }
-
-
-// const instance = await Faucet.deployed();
-
-// instance.addFunds({from: accounts[0], value: "2000000000000000000"})
-// instance.addFunds({from: accounts[1], value: "2000000000000000000"})
-
-// instance.withdraw("500000000000000000", {from: accounts[1]})
-
-// instance.getFunderAtIndex(0)
-// instance.getAllFunders()
