@@ -1,20 +1,20 @@
 import { JsonRpcProvider, ethers } from "ethers";
-import { loadIgnitionContract } from "../utils/loadIgnitionContract";
-
+import * as vaultArtifact from "../artifacts/contracts/Vault.sol/Vault.json";
 
 async function main() {
   const provider = new JsonRpcProvider("http://127.0.0.1:8545/");
   const network = await provider.getNetwork();
   const signer = await provider.getSigner(0);
 
-  // Load contract automatically from Ignition
-  const contract = loadIgnitionContract(
-    "Vault",  // contract name
-    Number(network.chainId),     // chainId
+  const abi = vaultArtifact.abi;
+
+   const contract = new ethers.Contract(
+    "0x5FbDB2315678afecb367f032d93F642f64180aa3", //smartcontract deployment address
+    abi,
     signer
   );
 
-  contract.on("Funder", (user, amount, event) => {
+  contract.on("Funder", (user, amount) => {
     const formattedAmount = ethers.formatEther(amount);
     console.log(`${user} : ${formattedAmount} ETH`);
   });

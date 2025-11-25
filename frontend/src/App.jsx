@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
+import contractAddress from "./contracts/contract-address-localhost.json";
+import VaultArtifact from "./contracts/Vault.json";
 
 function App() {
   const [provider, setProvider] = useState(null);
@@ -31,11 +33,7 @@ function App() {
       const signer = await web3Provider.getSigner(0);
 
       // Load contract with signer
-      const vaultContract = loadIgnitionContract(
-        "Vault", 
-        Number(network.chainId), 
-        signer
-      );
+      const vaultContract = new ethers.Contract(contractAddress.Vault, VaultArtifact.abi, signer);
 
       setProvider(web3Provider);
       setContract(vaultContract);
@@ -73,10 +71,6 @@ function App() {
       });
       setTxInfo(tx.hash);
       const receipt = await tx.wait();
-      contract.on("Funder", (user, NewGreeting, event)=> {
-        console.log("New user is", user);
-        console.log("New amount is", amount);
-      })
 
       if (receipt.status === 0) throw new Error("Transaction failed");
 
@@ -101,7 +95,6 @@ function App() {
       const tx = await contract.withdraw(ethers.parseEther("0.1"));
       setTxInfo(tx.hash);
       const receipt = await tx.wait();
-      console.log("Events:", receipt.events);
 
       if (receipt.status === 0) throw new Error("Transaction failed");
 

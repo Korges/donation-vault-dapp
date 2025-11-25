@@ -10,6 +10,9 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8545"
     }
   },
+  typechain: {
+    dontOverrideCompile: true // nie uruchamiaj po compile
+  }
 };
 
 export default config;
