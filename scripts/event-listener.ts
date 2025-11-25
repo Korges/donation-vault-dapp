@@ -16,7 +16,12 @@ async function main() {
 
   contract.on("Funder", (user, amount) => {
     const formattedAmount = ethers.formatEther(amount);
-    console.log(`${user} : ${formattedAmount} ETH`);
+    console.log(`${user} addFunds: ${formattedAmount} ETH`);
+  });
+
+  contract.on("Withdrawal", (user, amount) => {
+    const formattedAmount = ethers.formatEther(amount);
+    console.log(`${user} withdraw: ${formattedAmount} ETH`);
   });
 
   console.log("Listening for Funder events...");

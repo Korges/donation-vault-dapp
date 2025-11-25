@@ -9,6 +9,6 @@
     "@nomicfoundation/hardhat-toolbox": "^5.0.0"
   },
   "scripts": {
-    "frontend": "pnpm --filter ./frontend dev"
+    "frontend": "cd frontend && pnpm install && pnpm run dev"
   }
 }
