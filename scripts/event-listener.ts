@@ -1,25 +1,16 @@
 import { JsonRpcProvider, ethers } from "ethers";
-import VaultArtifact from "../artifacts/contracts/Vault.sol/Vault.json";
-import deployed from "../ignition/deployments/chain-31337/deployed_addresses.json";
+import { loadIgnitionContract } from "../utils/loadIgnitionContract";
 
-function getVaultAddress() {
-
-  const VAULT_ADDRESS = deployed["VaultModule#Vault"];
-  console.log(VAULT_ADDRESS);
-
-  return  VAULT_ADDRESS;
-}
 
 async function main() {
   const provider = new JsonRpcProvider("http://127.0.0.1:8545/");
-  const vaultAddress = getVaultAddress();
-  console.log("vault address : " + vaultAddress)
-
+  const network = await provider.getNetwork();
   const signer = await provider.getSigner(0);
 
-  const contract = new ethers.Contract(
-    vaultAddress,
-    VaultArtifact.abi,
+  // Load contract automatically from Ignition
+  const contract = loadIgnitionContract(
+    "Vault",  // contract name
+    Number(network.chainId),     // chainId
     signer
   );
 
@@ -28,7 +19,7 @@ async function main() {
     console.log(`${user} : ${formattedAmount} ETH`);
   });
 
-  console.log("Listening for Transfer events...");
+  console.log("Listening for Funder events...");
 }
 
 main().catch(console.error);

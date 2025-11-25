@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
-import VaultArtifact from "../../artifacts/contracts/Vault.sol/Vault.json"
 
 function App() {
   const [provider, setProvider] = useState(null);
@@ -28,12 +27,13 @@ function App() {
 
       // Create provider and signer
       const web3Provider = new ethers.BrowserProvider(detectedProvider);
+      const network = await web3Provider.getNetwork();
       const signer = await web3Provider.getSigner(0);
 
       // Load contract with signer
-      const vaultContract = new ethers.Contract(
-        "0x5FbDB2315678afecb367f032d93F642f64180aa3", // your contract address
-        VaultArtifact.abi,
+      const vaultContract = loadIgnitionContract(
+        "Vault", 
+        Number(network.chainId), 
         signer
       );
 
