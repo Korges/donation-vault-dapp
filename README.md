@@ -10,4 +10,12 @@
   - Copy the generated contract address 
   - `pnpm hardhat run ./scripts/event-listener.ts`
 
+  ```
+  korges@macbook donation-vault-dapp % pnpm hardhat run ./scripts/event-listener.ts
+  Listening for Funder events...
+  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 addFunds: 1.0 ETH
+  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 addFunds: 1.0 ETH
+  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 withdraw: 0.1 ETH
+```
+
   ![alt text](image.png)
