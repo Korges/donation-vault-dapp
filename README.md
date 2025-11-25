@@ -9,3 +9,5 @@
 7. **(Optional)**
   - Copy the generated contract address 
   - `pnpm hardhat run ./scripts/event-listener.ts`
+
+  ![alt text](image.png)
