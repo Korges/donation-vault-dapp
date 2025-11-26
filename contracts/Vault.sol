@@ -53,6 +53,12 @@ contract Vault is Owned, Logger, IVault {
     emit Withdrawal(msg.sender, withdrawAmount);
   }
 
+  function withdrawAll() override external {
+    payable(msg.sender).transfer(address(this).balance);
+
+    emit Withdrawal(msg.sender, address(this).balance);
+  }
+
   function getAllFunders() external view returns (address[] memory) {
     return donors;
   }
