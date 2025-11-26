@@ -18,8 +18,8 @@ contract Vault is Owned, Logger, IVault {
 
   modifier limitWithdraw(uint withdrawAmount) {
     require(
-      withdrawAmount <= 100000000000000000,
-      "Cannot withdraw more than 0.1 ether"
+      withdrawAmount <= address(this).balance,
+     "Not enough balance in contract"
     );
     _;
   }
