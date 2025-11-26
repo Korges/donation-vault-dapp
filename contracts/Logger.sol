@@ -4,12 +4,10 @@ pragma solidity ^0.8.28;
 
 abstract contract Logger {
 
-  uint public testNum;
+  event LogMessage(address indexed sender, string message);
 
-  constructor() {
-    testNum = 1000;
+  function log(string memory message) internal {
+    emit LogMessage(msg.sender, message);
   }
-
-  function emitLog() public pure virtual returns(bytes32);
 
 }

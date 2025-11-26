@@ -24,25 +24,18 @@ contract Vault is Owned, Logger, IVault {
     _;
   }
 
-  event Funder(address indexed user, uint amount);
-  event Withdrawal(address indexed user, uint amount);
-
   receive() external payable {}
 
-  function emitLog() public override pure returns(bytes32) {
-    return "Hello World";
-  }
-
   function addDonation() external override payable {
-    address funder = msg.sender;
+    address donorAddress = msg.sender;
 
-    if (donations[msg.sender] == 0) {
-      donors.push(msg.sender);
+    if (donations[donorAddress] == 0) {
+      donors.push(donorAddress);
     }
 
-    donations[msg.sender] += msg.value;
+    donations[donorAddress] += msg.value;
 
-    emit Funder(funder, msg.value);
+    log("New donation received");
   }
 
   function withdraw(uint withdrawAmount) override external onlyOwner limitWithdraw(withdrawAmount) {
@@ -50,13 +43,13 @@ contract Vault is Owned, Logger, IVault {
     require(address(this).balance >= withdrawAmount, "Not enough balance in contract");
     payable(msg.sender).transfer(withdrawAmount);
 
-    emit Withdrawal(msg.sender, withdrawAmount);
+    log("Withdrawal executed");
   }
 
   function withdrawAll() override external onlyOwner {
     payable(msg.sender).transfer(address(this).balance);
 
-    emit Withdrawal(msg.sender, address(this).balance);
+    log("All funds withdrawn");
   }
 
   function getAllDonors() external view returns (address[] memory) {
