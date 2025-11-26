@@ -5,11 +5,16 @@ import "./Owned.sol";
 import "./Logger.sol";
 import "./IVault.sol";
 
-contract Vault is Owned, Logger, IVault {
-  uint public numOfFunders;
 
-  mapping(address => bool) private funders;
-  mapping(uint => address) private lutFunders;
+contract Vault is Owned, Logger, IVault {
+
+  struct DonationInfo {
+    address donor;
+    uint amount;
+  }
+
+  mapping(address => uint) private donations;
+  address[] private donors;
 
   modifier limitWithdraw(uint withdrawAmount) {
     require(
@@ -28,16 +33,16 @@ contract Vault is Owned, Logger, IVault {
     return "Hello World";
   }
 
-  function addFunds() override external payable {
+  function addDonation() external override payable {
     address funder = msg.sender;
 
-    if (!funders[funder]) {
-      uint index = numOfFunders++;
-      funders[funder] = true;
-      lutFunders[index] = funder;
-      
+    if (donations[msg.sender] == 0) {
+      donors.push(msg.sender);
     }
-    emit Funder(msg.sender, msg.value);
+
+    donations[msg.sender] += msg.value;
+
+    emit Funder(funder, msg.value);
   }
 
   function withdraw(uint withdrawAmount) override external limitWithdraw(withdrawAmount) {
@@ -49,16 +54,23 @@ contract Vault is Owned, Logger, IVault {
   }
 
   function getAllFunders() external view returns (address[] memory) {
-    address[] memory _funders = new address[](numOfFunders);
-
-    for (uint i = 0; i < numOfFunders; i++) {
-      _funders[i] = lutFunders[i];
-    }
-
-    return _funders;
+    return donors;
   }
 
-  function getFunderAtIndex(uint8 index) external view returns(address) {
-    return lutFunders[index];
+  function getDonationForCaller() external view returns (uint) {
+    return donations[msg.sender];
+  }
+
+  function getAllDonations() external view returns (DonationInfo[] memory) {
+    DonationInfo[] memory result = new DonationInfo[](donors.length);
+
+    for (uint i = 0; i < donors.length; i++) {
+      result[i] = DonationInfo({
+        donor: donors[i],
+        amount: donations[donors[i]]
+      });
+    }
+
+    return result;
   }
 }
