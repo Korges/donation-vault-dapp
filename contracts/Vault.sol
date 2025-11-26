@@ -45,7 +45,7 @@ contract Vault is Owned, Logger, IVault {
     emit Funder(funder, msg.value);
   }
 
-  function withdraw(uint withdrawAmount) override external limitWithdraw(withdrawAmount) {
+  function withdraw(uint withdrawAmount) override external onlyOwner limitWithdraw(withdrawAmount) {
 
     require(address(this).balance >= withdrawAmount, "Not enough balance in contract");
     payable(msg.sender).transfer(withdrawAmount);
@@ -53,13 +53,13 @@ contract Vault is Owned, Logger, IVault {
     emit Withdrawal(msg.sender, withdrawAmount);
   }
 
-  function withdrawAll() override external {
+  function withdrawAll() override external onlyOwner {
     payable(msg.sender).transfer(address(this).balance);
 
     emit Withdrawal(msg.sender, address(this).balance);
   }
 
-  function getAllFunders() external view returns (address[] memory) {
+  function getAllDonors() external view returns (address[] memory) {
     return donors;
   }
 
