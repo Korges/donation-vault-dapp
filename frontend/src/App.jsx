@@ -62,11 +62,11 @@ function App() {
   };
 
   // Add 1 ETH to the contract
-  const addFunds = async () => {
+  const addDonation = async () => {
     if (!contract) return;
 
     try {
-      const tx = await contract.addFunds({
+      const tx = await contract.addDonation({
         value: ethers.parseEther("1"),
       });
       setTxInfo(tx.hash);
@@ -88,11 +88,11 @@ function App() {
   };
 
   // Withdraw 0.1 ETH from the contract
-  const withdraw = async () => {
+  const withdrawAll = async () => {
     if (!contract) return;
 
     try {
-      const tx = await contract.withdraw(ethers.parseEther("0.1"));
+      const tx = await contract.withdrawAll();
       setTxInfo(tx.hash);
       const receipt = await tx.wait();
 
@@ -149,7 +149,7 @@ function App() {
         <div className="flex gap-2">
           <button
             className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
-            onClick={addFunds}
+            onClick={addDonation}
             disabled={!contract}
           >
             Donate 1 ETH
@@ -157,10 +157,10 @@ function App() {
 
           <button
             className="flex-1 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 disabled:bg-gray-400"
-            onClick={withdraw}
+            onClick={withdrawAll}
             disabled={!contract}
           >
-            Withdraw 0.1 ETH
+            Withdraw All
           </button>
         </div>
       </div>
