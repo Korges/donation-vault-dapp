@@ -12,10 +12,11 @@
 
   ```
   korges@macbook donation-vault-dapp % pnpm hardhat run ./scripts/event-listener.ts
-  Listening for Funder events...
-  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 addFunds: 1.0 ETH
-  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 addFunds: 1.0 ETH
-  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 withdraw: 0.1 ETH
+  Listening for Vault events...
+  0x70997970C51812dc3A010C7d01b50e0d17dc79C8 New donation received
+  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 Withdrawal executed
+  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 All funds withdrawn
+  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 New donation received
   ```
   - `pnpm hardhat run ./scripts/get-all-donors.ts`
   ```

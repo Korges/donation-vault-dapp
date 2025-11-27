@@ -14,17 +14,11 @@ async function main() {
     signer
   );
 
-  contract.on("Funder", (user, amount) => {
-    const formattedAmount = ethers.formatEther(amount);
-    console.log(`${user} addFunds: ${formattedAmount} ETH`);
+  contract.on("LogMessage", (user, message) => {
+    console.log(`${user} ${message}`);
   });
 
-  contract.on("Withdrawal", (user, amount) => {
-    const formattedAmount = ethers.formatEther(amount);
-    console.log(`${user} withdraw: ${formattedAmount} ETH`);
-  });
-
-  console.log("Listening for Funder events...");
+  console.log("Listening for Vault events...");
 }
 
 main().catch(console.error);
