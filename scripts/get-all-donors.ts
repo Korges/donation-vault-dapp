@@ -1,6 +1,7 @@
 import { JsonRpcProvider, ethers } from "ethers";
 import * as vaultArtifact from "../artifacts/contracts/Vault.sol/Vault.json";
 
+
 async function main() {
   const provider = new JsonRpcProvider("http://127.0.0.1:8545/");
   const network = await provider.getNetwork();
