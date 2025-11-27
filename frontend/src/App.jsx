@@ -203,7 +203,7 @@ function App() {
           />
 
           <button
-            className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
+            className="flex-1 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 disabled:bg-gray-400"
             onClick={withdraw}
             disabled={!contract}
           >
