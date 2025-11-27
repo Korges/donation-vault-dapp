@@ -11,6 +11,8 @@ function App() {
   const [balance, setBalance] = useState("0");
   const [txError, setTxError] = useState(null);
   const [txInfo, setTxInfo] = useState(null);
+  const [donationAmount, setDonationAmount] = useState("0.1");
+  const [withdrawAmount, setWithdrawAmount] = useState("0.1");
 
   // Connect wallet and initialize contract
   const connectWallet = async () => {
@@ -67,7 +69,7 @@ function App() {
 
     try {
       const tx = await contract.addDonation({
-        value: ethers.parseEther("1"),
+        value: ethers.parseEther(donationAmount),
       });
       setTxInfo(tx.hash);
       const receipt = await tx.wait();
@@ -87,7 +89,32 @@ function App() {
     }
   };
 
-  // Withdraw 0.1 ETH from the contract
+
+  // Withdraw ETH from the contract
+  const withdraw = async () => {
+    if (!contract) return;
+
+    try {
+      const tx = await contract.withdraw(ethers.parseEther(withdrawAmount));
+      setTxInfo(tx.hash);
+      const receipt = await tx.wait();
+
+      if (receipt.status === 0) throw new Error("Transaction failed");
+
+      // Reload balance
+      const contractBalance = await provider.getBalance(
+        contract.target || contract.address
+      );
+      setBalance(ethers.formatEther(contractBalance));
+    } catch (err) {
+      console.error("Failed to withdraw:", err);
+      setTxError(err.reason || err.message);
+    } finally {
+      setTxInfo(null);
+    }
+  };
+
+  // Withdraw All ETH from the contract
   const withdrawAll = async () => {
     if (!contract) return;
 
@@ -112,13 +139,13 @@ function App() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 ">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-2xl font-bold mb-4">Faucet</h1>
 
         {!account ? (
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-4" 
             onClick={connectWallet}
           >
             Connect Wallet
@@ -146,15 +173,45 @@ function App() {
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-4">
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            value={donationAmount}
+            onChange={(e) => setDonationAmount(e.target.value)}
+            className="flex-1 px-3 py-2 border rounded text-right"
+          />
+
           <button
             className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
             onClick={addDonation}
             disabled={!contract}
           >
-            Donate 1 ETH
+            Donate ETH
           </button>
+        </div>
 
+        <div className="flex gap-2 mb-4">
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            value={withdrawAmount}
+            onChange={(e) => setWithdrawAmount(e.target.value)}
+            className="flex-1 px-3 py-2 border rounded text-right"
+          />
+
+          <button
+            className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
+            onClick={withdraw}
+            disabled={!contract}
+          >
+            Withdraw ETH
+          </button>
+        </div>
+
+        <div className="flex">
           <button
             className="flex-1 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 disabled:bg-gray-400"
             onClick={withdrawAll}
