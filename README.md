@@ -16,6 +16,21 @@
   0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 addFunds: 1.0 ETH
   0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 addFunds: 1.0 ETH
   0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 withdraw: 0.1 ETH
-```
+  ```
+  - `pnpm hardhat run ./scripts/get-all-donors.ts`
+  ```
+  === All Donors ===
+  1. 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+  ```
+  - `pnpm hardhat run ./scripts/get-all-donations.ts`
+  ```
+  === All Donations ===
+  1. Donor: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, Amount: 1.1 ETH
+  ```
+  - `pnpm hardhat run ./scripts/./scripts/get-donation-for-caller.ts`
+  ```
+  Donation for 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266: 1.1 ETH
+  ```
+  
 
   ![alt text](image.png)
