@@ -1,6 +1,9 @@
-import { ethers, artifacts, network } from "hardhat";
-import path from "path"
-import fs from "fs"
+import hre, { artifacts } from "hardhat";
+import path from "path";
+import fs from "fs";
+
+const { ethers, networkName } = await hre.network.connect();
+
 
 async function main() {
   // 1. Get the contract factory
@@ -9,29 +12,35 @@ async function main() {
   // 2. Deploy the contract
   const contract = await MyContractFactory.deploy();
 
+  console.log(contract)
+
   // 3. Wait for deployment to finish
   await contract.waitForDeployment();
+  const address = await contract.getAddress();
 
-  console.log("Contract deployed to:", contract.target); 
+  console.log("Contract deployed to:", address);
 
-  saveContractFiles(contract, "Vault");
+  saveContractFiles(address, "Vault");
 }
 
-function saveContractFiles(contract: any, contractName: string) {
-  const contractDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+async function saveContractFiles(address: any, contractName: string) {
+  const contractDir = path.join(process.cwd(), "frontend", "src", "contracts");
 
+  // Tworzymy folder jeśli nie istnieje
   if (!fs.existsSync(contractDir)) {
-    fs.mkdirSync(contractDir);
+    fs.mkdirSync(contractDir, { recursive: true });
   }
 
   // Save contract address
   fs.writeFileSync(
-    path.join(contractDir, `contract-address-${network.name}.json`),
-    JSON.stringify({ [contractName]: contract.target }, null, 2)
+    path.join(contractDir, `contract-address-${networkName}.json`),
+    JSON.stringify({ [contractName]: address }, null, 2)
   );
 
   // Save contract ABI & metadata
-  const artifact = artifacts.readArtifactSync(contractName);
+  const artifact = await hre.artifacts.readArtifact(contractName);
+  console.log("Artifact:")
+  console.log(artifact)
 
   fs.writeFileSync(
     path.join(contractDir, `${contractName}.json`),
@@ -44,6 +53,3 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
-
-
-// pnpm hardhat run scripts/deploy.js --network localhost
