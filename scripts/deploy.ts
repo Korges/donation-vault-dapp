@@ -20,7 +20,7 @@ async function main() {
 
   console.log("Contract deployed to:", address);
 
-  saveContractFiles(address, "SimpleBank");
+  sa  eContractFiles(address, "SimpleBank");
 }
 
 async function saveContractFiles(address: any, contractName: string) {

@@ -44,6 +44,11 @@ contract SimpleBank is ISimpleBank {
   ============================================================
   */
 
+  modifier onlyAdmin() {
+    require(msg.sender == admin, "Only admin can call this");
+    _;
+  }
+
   /*
   ============================================================
   CONSTRUCTOR
@@ -109,11 +114,11 @@ contract SimpleBank is ISimpleBank {
     return balances[msg.sender];
   }
 
-  function getContractBalance() external view returns (uint) {
+  function getContractBalance() external view onlyAdmin returns (uint) {
     return address(this).balance;
   }
 
-  function getAllUserBalances() external view returns (UserBalance[] memory) {
+  function getAllUserBalances() external view onlyAdmin returns (UserBalance[] memory) {
     UserBalance[] memory result = new UserBalance[](depositors.length);
 
     for (uint i = 0; i < depositors.length; i++) {

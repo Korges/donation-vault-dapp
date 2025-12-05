@@ -9,6 +9,9 @@ function App() {
   const [contract, setContract] = useState(null);
   const [account, setAccount] = useState(null);
   const [balance, setBalance] = useState("0");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [bankBalance, setBankBalance] = useState("0");
+  const [userBalances, setUserBalances] = useState([]);
   const [txError, setTxError] = useState(null);
   const [txInfo, setTxInfo] = useState(null);
   const [depositAmount, setDepositAmount] = useState("0.1");
@@ -55,6 +58,17 @@ function App() {
       // Load initial contract balance
       const balance = await bankContract.getBalance();
       setBalance(ethers.formatEther(balance));
+
+      const adminAddress = await bankContract.admin();
+      const signerAddress = await bankContract.runner.getAddress();
+
+      if (adminAddress.toLowerCase() === signerAddress.toLowerCase()) {
+        setIsAdmin(true);
+        await loadAdminData(bankContract);
+      } else {
+        setIsAdmin(false);
+      }
+
     } catch (err) {
       console.error("Failed to connect wallet:", err);
       setTxError(err.message);
@@ -136,6 +150,36 @@ function App() {
     }
   };
 
+  async function loadAdminData(contract) {
+    try {
+      // sprawdzenie czy user to admin (zakładam że masz pomocniczą funkcję)
+      const admin = await contract.admin();
+      const signerAddress = await contract.runner.getAddress();
+
+      if (admin.toLowerCase() !== signerAddress.toLowerCase()) {
+        console.log("Not admin - skipping admin dashboard");
+        return;
+      }
+
+      // 1️⃣ Pobranie salda kontraktu
+      const cBalance = await contract.getContractBalance();
+      setBankBalance(ethers.formatEther(cBalance));
+
+      // 2️⃣ Pobranie listy wszystkich userów i ich balansów
+      const balances = await contract.getAllUserBalances();
+
+      const formatted = balances.map(b => ({
+        user: b.user,
+        balance: ethers.formatEther(b.balance)
+      }));
+
+      setUserBalances(formatted);
+
+    } catch (e) {
+      console.error("Admin data error:", e);
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 ">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
@@ -208,16 +252,38 @@ function App() {
             Withdraw ETH
           </button>
         </div>
+        {isAdmin && (
+          <div className="admin-section mt-6">
+            <h1 className="text-xl font-bold mb-4">Admin Panel</h1>
 
-        {/* <div className="flex">
-          <button
-            className="flex-1 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 disabled:bg-gray-400"
-            onClick={withdrawAll}
-            disabled={!contract}
-          >
-            Withdraw All
-          </button>
-        </div> */}
+            <div className="text-lg mb-4">
+              Bank Total Balance: <strong>{bankBalance}</strong> ETH
+            </div>
+
+            <div className="text-lg mb-4">User Balances:</div>
+
+            {/* Responsive scroll container */}
+            <div className="overflow-x-auto border rounded-lg">
+              <table className="min-w-full text-left">
+                <thead className="bg-gray-200">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-semibold">User Address</th>
+                    <th className="px-4 py-2 text-left font-semibold">Balance (ETH)</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {userBalances.map((item, index) => (
+                    <tr key={index} className="border-t">
+                      <td className="px-4 py-2 break-all">{item.user}</td>
+                      <td className="px-4 py-2">{item.balance}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
