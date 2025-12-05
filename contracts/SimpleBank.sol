@@ -5,26 +5,75 @@ import "./Owned.sol";
 import "./ISimpleBank.sol";
 
 
-contract SimpleBank is Owned, ISimpleBank {
+contract SimpleBank is ISimpleBank {
 
-  // STATE VARIABLES
+  // Admin address
+  address public admin;
+
+  /*
+  ============================================================
+  STATE VARIABLES
+  ============================================================
+  */
+
   mapping(address => uint) private balances;
   address[] private depositors;
 
-  modifier limitWithdraw(uint withdrawAmount) {
-    require(
-      withdrawAmount <= address(this).balance,
-     "Not enough balance in contract"
-    );
-    _;
-  }
-
-  // EVENTS
+  /*
+  ============================================================
+  EVENTS
+  ============================================================
+  */
 
   event Deposit(address indexed user, uint256 amount);
   event Withdraw(address indexed user, uint256 amount);
 
-  // CORE FUNCTIONS
+  /*
+  ============================================================
+  STRUCTS 
+  ============================================================
+  */
+
+  struct UserBalance {
+    address user;
+    uint balance;
+  }
+
+  /*
+  ============================================================
+  MODIFIERS
+  ============================================================
+  */
+
+  /*
+  ============================================================
+  CONSTRUCTOR
+  ============================================================
+  */
+
+  constructor() {
+    admin = msg.sender; // set contract deployer as admin
+  }
+
+  /*
+  ============================================================
+  RECEIVE & FALLBACK HANDLING
+  ============================================================
+  */
+
+  receive() external payable {
+    revert("Use deposit() to send ETH");
+  }
+
+  fallback() external payable {
+    revert("Invalid function call");
+  }
+
+  /*
+  ============================================================
+  CORE FUNCTIONS
+  ============================================================
+  */
 
   function deposit() external override payable {
     address depositor = msg.sender;
@@ -40,7 +89,8 @@ contract SimpleBank is Owned, ISimpleBank {
 
   function withdraw(uint withdrawAmount) external override limitWithdraw(withdrawAmount) {
     require(withdrawAmount > 0, "Amount must be greater than 0");
-    require(address(this).balance >= withdrawAmount, "Insufficient Balance");
+    require(withdrawAmount <= balances[msg.sender], "Insufficient Balance");
+    require(withdrawAmount <= address(this).balance, "Not enough balance in contract");
 
     balances[msg.sender] -= withdrawAmount;
 
@@ -50,7 +100,11 @@ contract SimpleBank is Owned, ISimpleBank {
     emit Withdraw(msg.sender, withdrawAmount);
   }
 
-  // VIEW FUNCTIONS
+  /*
+  ============================================================
+  VIEW FUNCTIONS
+  ============================================================
+  */
 
   function getBalance() external view returns (uint) {
     return balances[msg.sender];
@@ -58,11 +112,6 @@ contract SimpleBank is Owned, ISimpleBank {
 
   function getContractBalance() external view returns (uint) {
     return address(this).balance;
-  }
-
-  struct UserBalance {
-    address user;
-    uint balance;
   }
 
   function getAllUserBalances() external view returns (UserBalance[] memory) {
@@ -76,15 +125,5 @@ contract SimpleBank is Owned, ISimpleBank {
     }
 
     return result;
-  }
-
-  // RECEIVE & FALLBACK HANDLING
-
-  receive() external payable {
-    revert("Use deposit() to send ETH");
-  }
-
-  fallback() external payable {
-    revert("Invalid function call");
   }
 }
