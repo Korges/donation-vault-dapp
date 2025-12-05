@@ -43,7 +43,7 @@ describe("SimpleBank", function () {
     ).to.be.revertedWith("Insufficient Balance");
   });
 
-    it("admin can get contract balance", async function () {
+  it("admin can get contract balance", async function () {
     await bank.connect(user1).deposit({ value: ethers.parseEther("3") });
 
     const cBalance = await bank.connect(admin).getContractBalance();
@@ -51,9 +51,9 @@ describe("SimpleBank", function () {
   });
 
   it("non-admin cannot get contract balance", async function () {
-    await expect(
-      bank.connect(user1).getContractBalance()
-    ).to.be.revertedWith("Only admin can call this");
+    await expect(bank.connect(user1).getContractBalance()).to.be.revertedWith(
+      "Only admin can call this"
+    );
   });
 
   it("admin can get all user balances", async function () {
@@ -72,9 +72,9 @@ describe("SimpleBank", function () {
   it("non-admin cannot get all user balances", async function () {
     await bank.connect(user1).deposit({ value: ethers.parseEther("1") });
 
-    await expect(
-      bank.connect(user1).getAllUserBalances()
-    ).to.be.revertedWith("Only admin can call this");
+    await expect(bank.connect(user1).getAllUserBalances()).to.be.revertedWith(
+      "Only admin can call this"
+    );
   });
 
   it("deposit emits Deposit event", async function () {
@@ -90,5 +90,4 @@ describe("SimpleBank", function () {
       .to.emit(bank, "Withdraw")
       .withArgs(user1.address, ethers.parseEther("1"));
   });
-  
 });
