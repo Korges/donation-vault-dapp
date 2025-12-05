@@ -14,11 +14,11 @@ async function main() {
   );
 
   contract.on("Deposit", (user, amount) => {
-    console.log(`Deposit | user: ${user} | amount: ${amount}`);
+    console.log(`Deposit | user: ${user} | amount: ${ethers.formatEther(amount)}`);
   });
 
   contract.on("Withdraw", (user, amount) => {
-    console.log(`Withdraw | user: ${user} | amount: ${amount}`);
+    console.log(`Withdraw | user: ${user} | amount:${ethers.formatEther(amount)}`);
   });
 
   console.log("Listening on events...");
