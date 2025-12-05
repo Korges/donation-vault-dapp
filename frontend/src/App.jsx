@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
 import contractAddress from "./contracts/contract-address-localhost.json";
-import VaultArtifact from "./contracts/Vault.json";
+import SimpleBankArtifact from "./contracts/SimpleBank.json";
 
 function App() {
   const [provider, setProvider] = useState(null);
@@ -11,7 +11,7 @@ function App() {
   const [balance, setBalance] = useState("0");
   const [txError, setTxError] = useState(null);
   const [txInfo, setTxInfo] = useState(null);
-  const [donationAmount, setDonationAmount] = useState("0.1");
+  const [depositAmount, setDepositAmount] = useState("0.1");
   const [withdrawAmount, setWithdrawAmount] = useState("0.1");
 
   // Connect wallet and initialize contract
@@ -35,10 +35,10 @@ function App() {
       const signer = await web3Provider.getSigner(0);
 
       // Load contract with signer
-      const vaultContract = new ethers.Contract(contractAddress.Vault, VaultArtifact.abi, signer);
+      const bankContract = new ethers.Contract(contractAddress.SimpleBank, SimpleBankArtifact.abi, signer);
 
       setProvider(web3Provider);
-      setContract(vaultContract);
+      setContract(bankContract);
 
       // Listen for account or network changes
       detectedProvider.on("accountsChanged", ([newAccount]) => {
@@ -53,10 +53,8 @@ function App() {
       detectedProvider.on("chainChanged", () => window.location.reload());
 
       // Load initial contract balance
-      const contractBalance = await web3Provider.getBalance(
-        vaultContract.target || vaultContract.address
-      );
-      setBalance(ethers.formatEther(contractBalance));
+      const balance = await bankContract.getBalance();
+      setBalance(ethers.formatEther(balance));
     } catch (err) {
       console.error("Failed to connect wallet:", err);
       setTxError(err.message);
@@ -64,12 +62,12 @@ function App() {
   };
 
   // Add 1 ETH to the contract
-  const addDonation = async () => {
+  const deposit = async () => {
     if (!contract) return;
 
     try {
-      const tx = await contract.addDonation({
-        value: ethers.parseEther(donationAmount),
+      const tx = await contract.deposit({
+        value: ethers.parseEther(depositAmount),
       });
       setTxInfo(tx.hash);
       const receipt = await tx.wait();
@@ -141,7 +139,7 @@ function App() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 ">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4">Faucet</h1>
+        <h1 className="text-2xl font-bold mb-4">Simple Bank App</h1>
 
         {!account ? (
           <button
@@ -178,17 +176,17 @@ function App() {
             type="number"
             min="0"
             step="0.1"
-            value={donationAmount}
-            onChange={(e) => setDonationAmount(e.target.value)}
-            className="flex-1 px-3 py-2 border rounded text-right"
+            value={depositAmount}
+            onChange={(e) => setDepositAmount(e.target.value)}
+            className="flex-1 px-3 py-2 border rounded"
           />
 
           <button
             className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
-            onClick={addDonation}
+            onClick={deposit}
             disabled={!contract}
           >
-            Donate ETH
+            Deposit ETH
           </button>
         </div>
 
@@ -199,7 +197,7 @@ function App() {
             step="0.1"
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
-            className="flex-1 px-3 py-2 border rounded text-right"
+            className="flex-1 px-3 py-2 border rounded"
           />
 
           <button
@@ -211,7 +209,7 @@ function App() {
           </button>
         </div>
 
-        <div className="flex">
+        {/* <div className="flex">
           <button
             className="flex-1 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 disabled:bg-gray-400"
             onClick={withdrawAll}
@@ -219,7 +217,7 @@ function App() {
           >
             Withdraw All
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

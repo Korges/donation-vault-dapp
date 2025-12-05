@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import "./Owned.sol";
 import "./ISimpleBank.sol";
 
 
@@ -87,7 +86,7 @@ contract SimpleBank is ISimpleBank {
     emit Deposit(depositor, msg.value);
   }
 
-  function withdraw(uint withdrawAmount) external override limitWithdraw(withdrawAmount) {
+  function withdraw(uint withdrawAmount) external override {
     require(withdrawAmount > 0, "Amount must be greater than 0");
     require(withdrawAmount <= balances[msg.sender], "Insufficient Balance");
     require(withdrawAmount <= address(this).balance, "Not enough balance in contract");

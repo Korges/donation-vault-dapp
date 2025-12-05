@@ -7,7 +7,7 @@ const { ethers, networkName } = await hre.network.connect();
 
 async function main() {
   // 1. Get the contract factory
-  const MyContractFactory = await ethers.getContractFactory("Vault");
+  const MyContractFactory = await ethers.getContractFactory("SimpleBank");
 
   // 2. Deploy the contract
   const contract = await MyContractFactory.deploy();
@@ -20,7 +20,7 @@ async function main() {
 
   console.log("Contract deployed to:", address);
 
-  saveContractFiles(address, "Vault");
+  saveContractFiles(address, "SimpleBank");
 }
 
 async function saveContractFiles(address: any, contractName: string) {
