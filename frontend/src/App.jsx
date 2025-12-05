@@ -34,7 +34,6 @@ function App() {
 
       // Create provider and signer
       const web3Provider = new ethers.BrowserProvider(detectedProvider);
-      const network = await web3Provider.getNetwork();
       const signer = await web3Provider.getSigner(0);
 
       // Load contract with signer
@@ -55,7 +54,7 @@ function App() {
       });
       detectedProvider.on("chainChanged", () => window.location.reload());
 
-      // Load initial contract balance
+      // Load user balance
       const balance = await bankContract.getBalance();
       setBalance(ethers.formatEther(balance));
 
@@ -65,6 +64,10 @@ function App() {
       if (adminAddress.toLowerCase() === signerAddress.toLowerCase()) {
         setIsAdmin(true);
         await loadAdminData(bankContract);
+
+        // Load bank balance
+        const bankBalance = await bankContract.getContractBalance();
+        setBankBalance(ethers.formatEther(bankBalance));
       } else {
         setIsAdmin(false);
       }
@@ -89,10 +92,13 @@ function App() {
       if (receipt.status === 0) throw new Error("Transaction failed");
 
       // Reload balance
-      const contractBalance = await provider.getBalance(
-        contract.target || contract.address
-      );
-      setBalance(ethers.formatEther(contractBalance));
+      const balance = await contract.getBalance();
+      setBalance(ethers.formatEther(balance));
+
+      if (isAdmin) {
+        const bankBalance = await contract.getContractBalance();
+        setBankBalance(ethers.formatEther(bankBalance));
+      }
     } catch (err) {
       console.error("Failed to add funds:", err);
       setTxError(err.reason || err.message);
@@ -114,34 +120,13 @@ function App() {
       if (receipt.status === 0) throw new Error("Transaction failed");
 
       // Reload balance
-      const contractBalance = await provider.getBalance(
-        contract.target || contract.address
-      );
-      setBalance(ethers.formatEther(contractBalance));
-    } catch (err) {
-      console.error("Failed to withdraw:", err);
-      setTxError(err.reason || err.message);
-    } finally {
-      setTxInfo(null);
-    }
-  };
+      const balance = await contract.getBalance();
+      setBalance(ethers.formatEther(balance));
 
-  // Withdraw All ETH from the contract
-  const withdrawAll = async () => {
-    if (!contract) return;
-
-    try {
-      const tx = await contract.withdrawAll();
-      setTxInfo(tx.hash);
-      const receipt = await tx.wait();
-
-      if (receipt.status === 0) throw new Error("Transaction failed");
-
-      // Reload balance
-      const contractBalance = await provider.getBalance(
-        contract.target || contract.address
-      );
-      setBalance(ethers.formatEther(contractBalance));
+      if (isAdmin) {
+        const bankBalance = await contract.getContractBalance();
+        setBankBalance(ethers.formatEther(bankBalance));
+      }
     } catch (err) {
       console.error("Failed to withdraw:", err);
       setTxError(err.reason || err.message);
