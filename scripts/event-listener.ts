@@ -1,9 +1,8 @@
 import { JsonRpcProvider, ethers } from "ethers";
-import * as vaultArtifact from "../artifacts/contracts/Vault.sol/Vault.json";
+import * as vaultArtifact from "../artifacts/contracts/SimpleBank.sol/SimpleBank.json";
 
 async function main() {
   const provider = new JsonRpcProvider("http://127.0.0.1:8545/");
-  const network = await provider.getNetwork();
   const signer = await provider.getSigner(0);
 
   const abi = vaultArtifact.abi;
@@ -14,11 +13,15 @@ async function main() {
     signer
   );
 
-  contract.on("LogMessage", (user, message) => {
-    console.log(`${user} ${message}`);
+  contract.on("Deposit", (user, amount) => {
+    console.log(`Deposit | user: ${user} | amount: ${amount}`);
   });
 
-  console.log("Listening for Vault events...");
+  contract.on("Withdraw", (user, amount) => {
+    console.log(`Withdraw | user: ${user} | amount: ${amount}`);
+  });
+
+  console.log("Listening on events...");
 }
 
 main().catch(console.error);

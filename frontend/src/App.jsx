@@ -98,6 +98,16 @@ function App() {
       if (isAdmin) {
         const bankBalance = await contract.getContractBalance();
         setBankBalance(ethers.formatEther(bankBalance));
+
+        // 2️⃣ Pobranie listy wszystkich userów i ich balansów
+        const balances = await contract.getAllUserBalances();
+
+        const formatted = balances.map(b => ({
+          user: b.user,
+          balance: ethers.formatEther(b.balance)
+        }));
+
+        setUserBalances(formatted);
       }
     } catch (err) {
       console.error("Failed to add funds:", err);
@@ -126,6 +136,16 @@ function App() {
       if (isAdmin) {
         const bankBalance = await contract.getContractBalance();
         setBankBalance(ethers.formatEther(bankBalance));
+
+        // 2️⃣ Pobranie listy wszystkich userów i ich balansów
+        const balances = await contract.getAllUserBalances();
+
+        const formatted = balances.map(b => ({
+          user: b.user,
+          balance: ethers.formatEther(b.balance)
+        }));
+
+        setUserBalances(formatted);
       }
     } catch (err) {
       console.error("Failed to withdraw:", err);

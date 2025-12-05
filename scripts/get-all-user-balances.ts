@@ -1,10 +1,10 @@
 import { JsonRpcProvider, ethers } from "ethers";
-import * as vaultArtifact from "../artifacts/contracts/Vault.sol/Vault.json";
+import * as vaultArtifact from "../artifacts/contracts/SimpleBank.sol/SimpleBank.json";
 
 
-interface DonationInfo {
-  donor: string;
-  amount: bigint; // ethers v6 uses bigint for uint256
+interface UserBalance {
+  user: string;
+  balance: bigint; // ethers v6 uses bigint for uint256
 }
 
 async function main() {
@@ -20,11 +20,11 @@ async function main() {
     signer
   );
 
-  const donations: DonationInfo[] = await contract.getAllDonations();
+  const donations: UserBalance[] = await contract.getAllUserBalances();
 
-  console.log("=== All Donations ===");
-  donations.forEach((don, index) => {
-    console.log(`${index + 1}. Donor: ${don.donor}, Amount: ${ethers.formatEther(don.amount)} ETH`);
+  console.log("=== User Balances ===");
+  donations.forEach((row, index) => {
+    console.log(`${index + 1}. User: ${row.user}, Balance: ${ethers.formatEther(row.balance)} ETH`);
   });
 
 }

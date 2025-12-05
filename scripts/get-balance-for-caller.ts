@@ -1,10 +1,9 @@
 import { JsonRpcProvider, ethers } from "ethers";
-import * as vaultArtifact from "../artifacts/contracts/Vault.sol/Vault.json";
+import * as vaultArtifact from "../artifacts/contracts/SimpleBank.sol/SimpleBank.json";
 
 
 async function main() {
   const provider = new JsonRpcProvider("http://127.0.0.1:8545/");
-  const network = await provider.getNetwork();
   const signer = await provider.getSigner(0);
   const address = await signer.getAddress();
 
@@ -16,10 +15,9 @@ async function main() {
     signer
   );
 
-  const donationAmount = await contract.getDonationForCaller();
+  const donationAmount = await contract.getBalance();
 
-  console.log(`Donation for ${address}: ${ethers.formatEther(donationAmount)} ETH`);
-
+  console.log(`Balance for ${address}: ${ethers.formatEther(donationAmount)} ETH`);
 }
 
 main().catch(console.error);

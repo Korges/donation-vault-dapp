@@ -20,7 +20,7 @@ async function main() {
 
   console.log("Contract deployed to:", address);
 
-  sa  eContractFiles(address, "SimpleBank");
+  saveContractFiles(address, "SimpleBank");
 }
 
 async function saveContractFiles(address: any, contractName: string) {
@@ -39,8 +39,6 @@ async function saveContractFiles(address: any, contractName: string) {
 
   // Save contract ABI & metadata
   const artifact = await hre.artifacts.readArtifact(contractName);
-  console.log("Artifact:")
-  console.log(artifact)
 
   fs.writeFileSync(
     path.join(contractDir, `${contractName}.json`),
