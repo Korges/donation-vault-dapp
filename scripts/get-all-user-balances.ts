@@ -14,7 +14,7 @@ async function main() {
 
   const abi = vaultArtifact.abi;
 
-   const contract = new ethers.Contract(
+  const contract = new ethers.Contract(
     "0x5FbDB2315678afecb367f032d93F642f64180aa3", //smartcontract deployment address
     abi,
     signer

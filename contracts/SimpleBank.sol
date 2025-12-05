@@ -4,131 +4,131 @@ pragma solidity ^0.8.28;
 import "./ISimpleBank.sol";
 
 contract SimpleBank is ISimpleBank {
-    // Admin address
-    address public admin;
+  // Admin address
+  address public admin;
 
-    /*
+  /*
   ============================================================
   STATE VARIABLES
   ============================================================
   */
 
-    mapping(address => uint) private balances;
-    address[] private depositors;
+  mapping(address => uint) private balances;
+  address[] private depositors;
 
-    /*
+  /*
   ============================================================
   EVENTS
   ============================================================
   */
 
-    event Deposit(address indexed user, uint256 amount);
-    event Withdraw(address indexed user, uint256 amount);
+  event Deposit(address indexed user, uint256 amount);
+  event Withdraw(address indexed user, uint256 amount);
 
-    /*
+  /*
   ============================================================
   STRUCTS 
   ============================================================
   */
 
-    struct UserBalance {
-        address user;
-        uint balance;
-    }
+  struct UserBalance {
+      address user;
+      uint balance;
+  }
 
-    /*
+  /*
   ============================================================
   MODIFIERS
   ============================================================
   */
 
-    modifier onlyAdmin() {
-        require(msg.sender == admin, "Only admin can call this");
-        _;
-    }
+  modifier onlyAdmin() {
+    require(msg.sender == admin, "Only admin can call this");
+    _;
+  }
 
-    /*
+  /*
   ============================================================
   CONSTRUCTOR
   ============================================================
   */
 
-    constructor() {
-        admin = msg.sender; // set contract deployer as admin
-    }
+  constructor() {
+    admin = msg.sender; // set contract deployer as admin
+  }
 
-    /*
+  /*
   ============================================================
   RECEIVE & FALLBACK HANDLING
   ============================================================
   */
 
-    receive() external payable {
-        revert("Use deposit() to send ETH");
-    }
+  receive() external payable {
+    revert("Use deposit() to send ETH");
+  }
 
-    fallback() external payable {
-        revert("Invalid function call");
-    }
+  fallback() external payable {
+    revert("Invalid function call");
+  }
 
-    /*
+  /*
   ============================================================
   CORE FUNCTIONS
   ============================================================
   */
 
-    function deposit() external payable override {
-        address depositor = msg.sender;
+  function deposit() external payable override {
+    address depositor = msg.sender;
 
-        if (balances[depositor] == 0) {
-            depositors.push(depositor);
-        }
-
-        balances[depositor] += msg.value;
-
-        emit Deposit(depositor, msg.value);
+    if (balances[depositor] == 0) {
+      depositors.push(depositor);
     }
 
-    function withdraw(uint withdrawAmount) external override {
-        require(withdrawAmount <= balances[msg.sender], "Insufficient Balance");
+    balances[depositor] += msg.value;
 
-        balances[msg.sender] -= withdrawAmount;
+    emit Deposit(depositor, msg.value);
+  }
 
-        (bool success, ) = payable(msg.sender).call{value: withdrawAmount}("");
-        require(success, "Transfer failed");
+  function withdraw(uint withdrawAmount) external override {
+    require(withdrawAmount <= balances[msg.sender], "Insufficient Balance");
 
-        emit Withdraw(msg.sender, withdrawAmount);
-    }
+    balances[msg.sender] -= withdrawAmount;
 
-    /*
+    (bool success, ) = payable(msg.sender).call{value: withdrawAmount}("");
+    require(success, "Transfer failed");
+
+    emit Withdraw(msg.sender, withdrawAmount);
+  }
+
+  /*
   ============================================================
   VIEW FUNCTIONS
   ============================================================
   */
 
-    function getBalance() external view returns (uint) {
-        return balances[msg.sender];
+  function getBalance() external view returns (uint) {
+    return balances[msg.sender];
+  }
+
+  function getContractBalance() external view onlyAdmin returns (uint) {
+    return address(this).balance;
+  }
+
+  function getAllUserBalances()
+    external
+    view
+    onlyAdmin
+    returns (UserBalance[] memory)
+  {
+    UserBalance[] memory result = new UserBalance[](depositors.length);
+
+    for (uint i = 0; i < depositors.length; i++) {
+      result[i] = UserBalance({
+        user: depositors[i],
+        balance: balances[depositors[i]]
+      });
     }
 
-    function getContractBalance() external view onlyAdmin returns (uint) {
-        return address(this).balance;
-    }
-
-    function getAllUserBalances()
-        external
-        view
-        onlyAdmin
-        returns (UserBalance[] memory)
-    {
-        UserBalance[] memory result = new UserBalance[](depositors.length);
-
-        for (uint i = 0; i < depositors.length; i++) {
-            result[i] = UserBalance({
-                user: depositors[i],
-                balance: balances[depositors[i]]
-            });
-        }
-
-        return result;
-    }
+    return result;
+  }
 }
